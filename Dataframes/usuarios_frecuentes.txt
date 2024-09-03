@@ -1,0 +1,16 @@
+id_usuario	id_vehiculo	nombre_U	saldo	contraseña	email
+USR-00001	XDX619	Usuario_1	194.04	vK0UjWW3	usuario1@example.com
+USR-00002	EZB133	Usuario_2	30.66	Rd1a6DY1	usuario2@example.com
+USR-00003	QFO80G	Usuario_3	101.96	NAQc7M9j	usuario3@example.com
+USR-00004	WKC102	Usuario_4	178.1	3frsgTby	usuario4@example.com
+USR-00005	SXF40F	Usuario_5	885.15	0fBPag10	usuario5@example.com
+USR-00006	JGC787	Usuario_6	535.81	1Q1tym1N	usuario6@example.com
+USR-00007	SXF40F	Usuario_7	143.61	T8TJa2qb	usuario7@example.com
+USR-00008	WKC102	Usuario_8	736.39	a5eziAWC	usuario8@example.com
+USR-00009	JGC787	Usuario_9	89.84	ny73c4As	usuario9@example.com
+USR-00010	CVA87T	Usuario_10	985.8	OTN6975a	usuario10@example.com
+USR-00011	WKC102	Usuario_11	773.76	JDhohP7C	usuario11@example.com
+USR-00012	WKC102	Usuario_12	982.67	Pj6n2bdN	usuario12@example.com
+USR-00013	JGC787	Usuario_13	284.25	7RfoD7XS	usuario13@example.com
+USR-00014	QFO80G	Usuario_14	640.46	uRGMzjII	usuario14@example.com
+USR-00015	JGC787	Usuario_15	175.17	FRucVil3	usuario15@example.com

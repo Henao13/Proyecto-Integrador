@@ -1,0 +1,11 @@
+id_vehiculo	tipo_vehiculo
+RBY96C	Moto
+EZB133	Automóvil
+WKC102	Automóvil
+JGC787	Automóvil
+ZQP75X	Moto
+SXF40F	Moto
+QFO80G	Moto
+XYY052	Automóvil
+XDX619	Automóvil
+CVA87T	Moto
