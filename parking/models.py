@@ -11,6 +11,9 @@ class Vehiculo(models.Model):
     
     def __str__(self):
         return f"{self.id_vehiculo} ({self.tipo_vehiculo})"
+    
+    class Meta:
+        app_label = 'parking'
 
 class UsuarioFrecuente(models.Model):
     id_usuario = models.CharField(max_length=10, primary_key=True)
@@ -22,4 +25,7 @@ class UsuarioFrecuente(models.Model):
     
     def __str__(self):
         return self.nombre_U
+    
+    class Meta:
+        app_label = 'parking'
 
