@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virtual Parking</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #545ff3;
+            padding: 10px 20px;
+        }
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            padding: 10px 15px;
+        }
+        .navbar a:hover {
+            background-color: #575757;
+        }
+        .navbar-left a {
+            margin-right: 10px;
+        }
+        .navbar-right a {
+            margin-left: 10px;
+        }
+        #saldo-disponible {
+            color: white;
+            margin-left: 10px;
+        }
+        .container {
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="navbar">
+            <div class="navbar-left">
+                <a href="{% url 'home' %}">Inicio</a>
+                <a href="#">About</a>
+                <!-- Add more navbar links here -->
+            </div>
+            <div class="navbar-right">
+                {% if request.session.usuario_id %}
+                    <span id="saldo-disponible">Saldo: ${{ usuario.saldo }}</span>
+                    <a href="{% url 'logout' %}">Cerrar sesión</a>
+                {% else %}
+                    <a href="{% url 'login' %}">Login</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+    
+    <div class="container">
+        {% block content %}
+        {% endblock content %}
+    </div>
+    
+    <!-- Add your JavaScript scripts and other body elements here -->
+</body>
+</html>
