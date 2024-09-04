@@ -1,5 +1,17 @@
+<!-- templates/home.html -->
 {% extends "base.html" %}
+
 {% block content %}
     <h1>Bienvenido a Virtual Parking</h1>
     <p>Esta es la página de inicio del sitio web.</p>
-{% endblock content %}
+    <h2>Instrucciones para realizar un depósito</h2>
+    <ol>
+        <li>Inicie sesión en su cuenta.</li>
+        <li>Vaya a la sección "Depósitos" en el menú principal.</li>
+        <li>Seleccione el método de pago que prefiera.</li>
+        <li>Ingrese el monto que desea depositar.</li>
+        <li>Confirme los detalles de su depósito.</li>
+        <li>Complete el proceso de pago según el método seleccionado.</li>
+        <li>Una vez confirmado el pago, el saldo se actualizará en su cuenta.</li>
+    </ol>
+{% endblock %}
