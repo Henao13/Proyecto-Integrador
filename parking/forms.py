@@ -13,3 +13,7 @@ class LoginForm(forms.Form):
         self.helper = FormHelper()
         self.helper.form_method = 'post'
         self.helper.add_input(Submit('submit', 'Login'))
+        
+class SimularTransaccionForm(forms.Form):
+    cantidad = forms.DecimalField(max_digits=10, decimal_places=2, min_value=0.01, label="Cantidad a agregar")
+
