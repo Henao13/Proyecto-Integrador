@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simular Transacción</title>
+</head>
+<body>
+    <h1>Simular Transacción</h1>
+    
+    <!-- Mostrar el saldo actual -->
+    <p>Saldo actual: {{ user.saldo }}</p>
+
+    <!-- Formulario para ingresar la cantidad -->
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Agregar Saldo</button>
+    </form>
+
+</body>
+</html>

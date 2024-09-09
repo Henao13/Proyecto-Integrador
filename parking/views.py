@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from .models import UsuarioFrecuente
-from .forms import LoginForm
+from .forms import LoginForm, SimularTransaccionForm
 
 def home(request):
     usuario = None
@@ -31,3 +31,28 @@ def user_logout(request):
     if 'usuario_id' in request.session:
         del request.session['usuario_id']
     return redirect('home')
+
+def simular_transaccion_view(request, id_usuario):
+    # Obtener el usuario con el id pasado en la URL
+    user = UsuarioFrecuente.objects.get(id_usuario=id_usuario)
+
+    if request.method == 'POST':
+        form = SimularTransaccionForm(request.POST)
+        if form.is_valid():
+            # Lógica para agregar saldo
+            cantidad = form.cleaned_data['cantidad']
+            user.saldo += cantidad
+            user.save()
+
+            # Redirigir o mostrar un mensaje de éxito
+            return render(request, 'saldo.html', {
+                'form': form,
+                'user': user,
+                'nuevo_saldo': user.saldo,
+                'success': True
+            })
+    else:
+        form = SimularTransaccionForm()
+
+    # Renderizar el formulario inicialmente
+    return render(request, 'saldo.html', {'form': form, 'user': user})
