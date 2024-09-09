@@ -1,9 +1,14 @@
-from django.shortcuts import render, redirect
+# parking/views.py
+
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.http import JsonResponse
 from .models import UsuarioFrecuente
-from .forms import LoginForm
+from .forms import LoginForm, SaldoForm
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from decimal import Decimal, InvalidOperation
+from .decorators import usuario_login_requerido
 
 def home(request):
     usuario = None
@@ -29,33 +34,30 @@ def user_login(request):
         form = LoginForm()
     return render(request, 'login.html', {'form': form})
 
+
 def user_logout(request):
     if 'usuario_id' in request.session:
         del request.session['usuario_id']
     return redirect('home')
 
-def simular_transaccion_view(request, id_usuario):
-    # Obtener el usuario por su ID
-    user = UsuarioFrecuente.objects.get(id_usuario=id_usuario)
-
-    if request.method == "POST":
-        # Obtener la cantidad desde el formulario
-        cantidad = request.POST.get('cantidad', 0)
-
-        try:
-            # Convertir la cantidad a Decimal
-            cantidad = Decimal(cantidad)
-
-            # Aumentar el saldo del usuario
-            user.saldo += cantidad
-            user.save()
-
-            # Devolver la nueva cantidad como respuesta JSON
-            return JsonResponse({"nuevo saldo": str(user.saldo)})  # Convertir a string para JSON
-
-        except (ValueError, InvalidOperation):
-            # Manejar el caso en que la cantidad no sea un número válido
-            return JsonResponse({"error": "La cantidad debe ser un número válido."}, status=400)
-
-    # Renderizar la plantilla y pasar el objeto usuario al contexto
-    return render(request, 'saldo.html', {'user': user})
+@usuario_login_requerido
+def saldo(request):
+    usuario_id = request.session['usuario_id']
+    usuario = UsuarioFrecuente.objects.get(id_usuario=usuario_id)
+    
+    if request.method == 'POST':
+        form = SaldoForm(request.POST)
+        if form.is_valid():
+            try:
+                saldo = Decimal(form.cleaned_data['saldo'])
+                usuario.saldo += saldo
+                usuario.save()
+                messages.success(request, 'Saldo añadido correctamente.')
+            except InvalidOperation:
+                messages.error(request, 'Saldo inválido.')
+        else:
+            messages.error(request, 'Formulario inválido.')
+    else:
+        form = SaldoForm()
+    
+    return render(request, 'saldo.html', {'form': form, 'usuario': usuario})
