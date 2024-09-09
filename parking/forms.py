@@ -13,3 +13,12 @@ class LoginForm(forms.Form):
         self.helper = FormHelper()
         self.helper.form_method = 'post'
         self.helper.add_input(Submit('submit', 'Login'))
+
+class SaldoForm(forms.Form):
+    saldo = forms.DecimalField(max_digits=10, decimal_places=2, label='Saldo a depositar')
+
+    def __init__(self, *args, **kwargs):
+        super(SaldoForm, self).__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_method = 'post'
+        self.helper.add_input(Submit('submit', 'Añadir saldo'))
