@@ -2,12 +2,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <h1>Ingrese su saldo</h1>
-    <form method="POST">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <input type="submit" value="Añadir saldo">
-    </form>
+    <h1>Saldo</h1>
     <p>Saldo actual: ${{ usuario.saldo }}</p>
+    <a href="{% url 'payment' %}">Añadir saldo</a>
 {% endblock %}
-
