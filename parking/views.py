@@ -107,7 +107,7 @@ def payment(request):
                     return redirect('home')
                 else:
                     messages.error(request, 'Saldo insuficiente para realizar este pago.')
-            if tipo_tarifa == 'Recargar saldo':
+            elif tipo_tarifa == 'Recargar saldo':
                 if saldo > 0:
                     usuario.saldo += saldo  # Sumar el saldo
                     usuario.save()  # Guardar cambios
