@@ -1,37 +1,8 @@
-<<<<<<< HEAD
 <!-- templates/saldo.html -->
 {% extends 'base.html' %}
 
 {% block content %}
-    <h1>Ingrese su saldo</h1>
-    <form method="POST">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <input type="submit" value="Añadir saldo">
-    </form>
+    <h1>Saldo</h1>
     <p>Saldo actual: ${{ usuario.saldo }}</p>
+    <a href="{% url 'payment' %}">Añadir saldo</a>
 {% endblock %}
-=======
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simular Transacción</title>
-</head>
-<body>
-    <h1>Simular Transacción</h1>
-    
-    <!-- Mostrar el saldo actual -->
-    <p>Saldo actual: {{ user.saldo }}</p>
-
-    <!-- Formulario para ingresar la cantidad -->
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Agregar Saldo</button>
-    </form>
-
-</body>
-</html>
->>>>>>> 75bda3f42c5d8bcfa3e1f7b520f137fd9139f1b7

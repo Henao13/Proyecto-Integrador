@@ -1,12 +1,15 @@
+# parking/views.py
+
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.http import JsonResponse
-from .models import UsuarioFrecuente
-from .forms import LoginForm, SaldoForm
+from .models import UsuarioFrecuente, Tarifa
+from .forms import LoginForm, SaldoForm, PaymentForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from decimal import Decimal, InvalidOperation
 from .decorators import usuario_login_requerido
+from django.utils import timezone
 
 def home(request):
     usuario = None
@@ -59,3 +62,66 @@ def saldo(request):
         form = SaldoForm()
     
     return render(request, 'saldo.html', {'form': form, 'usuario': usuario})
+
+
+@usuario_login_requerido
+def payment(request):
+    # Obtener el usuario de la sesión
+    usuario_id = request.session['usuario_id']
+    usuario = UsuarioFrecuente.objects.get(id_usuario=usuario_id)
+
+    if request.method == 'POST':
+        form = PaymentForm(request.POST)
+        if form.is_valid():
+            tipo_tarifa = form.cleaned_data['tipo_tarifa']
+            saldo = Decimal(form.cleaned_data['saldo']) if tipo_tarifa == 'Recargar saldo' else Decimal('0.00')
+
+            # Definir los valores de las tarifas
+            tarifas_valores = {
+                'Pagar día': Decimal('14000'),
+                'Pagar hora': Decimal('3500'),
+                'Recargar saldo': saldo  
+            }
+
+            # Debug: Mostrar el tipo de tarifa seleccionada
+            print(f'Tipo de tarifa seleccionada: {tipo_tarifa}')
+
+            # Manejo de pago por tarifa
+            if tipo_tarifa in ['Pagar día', 'Pagar hora']:
+                valor_tarifa = tarifas_valores[tipo_tarifa]  # Obtener el valor de la tarifa
+
+                # Debug: Mostrar el saldo antes de realizar el pago
+                print(f'Saldo del usuario antes del pago: {usuario.saldo}')
+
+                if usuario.saldo >= valor_tarifa:  # Verifica que el saldo sea suficiente
+                    usuario.saldo -= valor_tarifa  # Descuenta el saldo
+                    usuario.save()  # Guarda los cambios
+
+                    # Crear una nueva tarifa (opcional)
+                    Tarifa.objects.create(
+                        id_tarifa=tipo_tarifa,  # Usar el tipo de tarifa como ID
+                        cost=valor_tarifa,
+                    )
+
+                    messages.success(request, f'Pago de ${valor_tarifa} realizado con éxito. Saldo actualizado.')
+                    return redirect('home')
+                else:
+                    messages.error(request, 'Saldo insuficiente para realizar este pago.')
+            if tipo_tarifa == 'Recargar saldo':
+                if saldo > 0:
+                    usuario.saldo += saldo  # Sumar el saldo
+                    usuario.save()  # Guardar cambios
+                    messages.success(request, f'Saldo de ${saldo} recargado con éxito. Saldo actualizado.')
+                    return redirect('home')
+                else:
+                    messages.error(request, 'Monto inválido.')
+            else:
+                messages.error(request, 'Tipo de tarifa no válido.')
+        else:
+            # Debug: Mostrar errores de validación
+            print("Errores en el formulario:", form.errors)
+            messages.error(request, 'Formulario inválido.')
+    else:
+        form = PaymentForm()
+
+    return render(request, 'payment.html', {'form': form, 'usuario': usuario})

@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h2>Simulación de Pasarela de Pagos</h2>
+    <form method="post">
+        {% csrf_token %}
+        
+        <div>
+            {{ form.tipo_tarifa.label_tag }} {{ form.tipo_tarifa }}  <!-- Campo tipo_tarifa como select -->
+        </div>
+
+        <div id="campoSaldo" style="display: none;">
+            {{ form.saldo.label_tag }} {{ form.saldo }}  <!-- Campo de saldo -->
+        </div>
+
+        <div id="camposTarjeta" style="display: none;">
+            {{ form.card_number.label_tag }} {{ form.card_number }}  <!-- Campo número de tarjeta -->
+            {{ form.card_expiry.label_tag }} {{ form.card_expiry }}  <!-- Campo fecha de expiración -->
+            {{ form.card_cvc.label_tag }} {{ form.card_cvc }}  <!-- Campo CVC -->
+        </div>
+
+        <button type="submit">Realizar Pago</button>
+    </form>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    {% for field in form %}
+        {% for error in field.errors %}
+            <div class="alert alert-danger">{{ error }}</div>
+        {% endfor %}
+    {% endfor %}
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const tipoTarifaField = document.getElementById("id_tipo_tarifa");
+            const campoSaldo = document.getElementById("campoSaldo");
+            const camposTarjeta = document.getElementById("camposTarjeta");
+
+            function toggleCampos() {
+                if (tipoTarifaField.value === 'Recargar saldo') {
+                    campoSaldo.style.display = "block";  // Muestra el campo de saldo
+                    camposTarjeta.style.display = "block"; // Muestra campos de tarjeta
+                } else {
+                    campoSaldo.style.display = "none";   // Oculta el campo de saldo
+                    camposTarjeta.style.display = "none"; // Oculta campos de tarjeta
+                }
+            }
+
+            tipoTarifaField.addEventListener("change", toggleCampos);
+            toggleCampos();  // Llamada inicial para configurar el estado
+        });
+    </script>
+{% endblock %}

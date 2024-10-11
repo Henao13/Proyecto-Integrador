@@ -29,3 +29,25 @@ class UsuarioFrecuente(models.Model):
     class Meta:
         app_label = 'parking'
 
+class Tarifa(models.Model):
+    CHOICES_TARIFA = [
+        ('Pagar día', 'Pagar día'),
+        ('Pagar hora', 'Pagar hora'),
+        ('Recargar saldo', 'Recargar saldo'),
+    ]
+    id_tarifa = models.CharField(max_length=20, choices=CHOICES_TARIFA, primary_key=True)
+    cost = models.DecimalField(max_digits=10, decimal_places=2)
+
+    def __str__(self):
+        return f"{self.id_tarifa} ({self.cost})"
+    
+    class Meta:
+        app_label = 'parking'
+
+class Transaccion(models.Model):
+    id_transaccion = models.CharField(max_length=10, primary_key=True)
+    id_tarifa = models.ForeignKey(Tarifa, on_delete=models.CASCADE)
+    id_vehicle = models.ForeignKey(Vehiculo, on_delete=models.CASCADE)
+    
+    class Meta:
+        app_label = 'parking'

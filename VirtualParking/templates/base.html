@@ -40,31 +40,32 @@
             padding: 20px;
         }
     </style>
-</head>
-<body>
-    <nav>
-        <div class="navbar">
-            <div class="navbar-left">
-                <a href="{% url 'home' %}">Inicio</a>
-                <a href="#">About</a>
-                <!-- Add more navbar links here -->
+    </head>
+    <body>
+        <nav>
+            <div class="navbar">
+                <div class="navbar-left">
+                    <a href="{% url 'home' %}">Inicio</a>
+                    <a href="#">About</a>
+                    <!-- Add more navbar links here -->
+                </div>
+                <div class="navbar-right">
+                    {% if request.session.usuario_id %}
+                        <span id="saldo-disponible">Saldo: ${{ usuario.saldo }}</span>
+                        <a href="{% url 'payment' %}">Realizar Pago</a>
+                        <a href="{% url 'logout' %}">Cerrar sesión</a>
+                    {% else %}
+                        <a href="{% url 'login' %}">Login</a>
+                    {% endif %}
+                </div>
             </div>
-            <div class="navbar-right">
-                {% if request.session.usuario_id %}
-                    <span id="saldo-disponible">Saldo: ${{ usuario.saldo }}</span>
-                    <a href="{% url 'logout' %}">Cerrar sesión</a>
-                {% else %}
-                    <a href="{% url 'login' %}">Login</a>
-                {% endif %}
-            </div>
+        </nav>
+        
+        <div class="container">
+            {% block content %}
+            {% endblock content %}
         </div>
-    </nav>
-    
-    <div class="container">
-        {% block content %}
-        {% endblock content %}
-    </div>
-    
-    <!-- Add your JavaScript scripts and other body elements here -->
-</body>
-</html>
+        
+        <!-- Add your JavaScript scripts and other body elements here -->
+    </body>
+    </html>
