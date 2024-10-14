@@ -63,7 +63,6 @@ def saldo(request):
     
     return render(request, 'saldo.html', {'form': form, 'usuario': usuario})
 
-
 @usuario_login_requerido
 def payment(request):
     # Obtener el usuario de la sesión
@@ -87,32 +86,59 @@ def payment(request):
             print(f'Tipo de tarifa seleccionada: {tipo_tarifa}')
 
             # Manejo de pago por tarifa
-            if tipo_tarifa in ['Pagar día', 'Pagar hora']:
+            if tipo_tarifa == 'Pagar día':
                 valor_tarifa = tarifas_valores[tipo_tarifa]  # Obtener el valor de la tarifa
 
                 # Debug: Mostrar el saldo antes de realizar el pago
                 print(f'Saldo del usuario antes del pago: {usuario.saldo}')
+                print(f'Valor de la tarifa seleccionada: {valor_tarifa}')
 
-                if usuario.saldo >= valor_tarifa:  # Verifica que el saldo sea suficiente
-                    usuario.saldo -= valor_tarifa  # Descuenta el saldo
-                    usuario.save()  # Guarda los cambios
+                if usuario.saldo >= 14000:  # Verifica que el saldo sea suficiente
+                    try:
+                        usuario.saldo -= 14000  # Descuenta el saldo
 
-                    # Crear una nueva tarifa (opcional)
-                    Tarifa.objects.create(
-                        id_tarifa=tipo_tarifa,  # Usar el tipo de tarifa como ID
-                        cost=valor_tarifa,
-                    )
+                        # Debug: Mostrar el saldo después de realizar el pago
+                        print(f'Saldo del usuario después del pago: {usuario.saldo}')
 
-                    messages.success(request, f'Pago de ${valor_tarifa} realizado con éxito. Saldo actualizado.')
-                    return redirect('home')
+                        usuario.save()  # Guarda los cambios
+                        messages.success(request, f'Pago de ${valor_tarifa} realizado con éxito. Saldo actualizado.')
+                        return redirect('home')
+                    except InvalidOperation:
+                        messages.error(request, 'Operación inválida al descontar el saldo.')
                 else:
                     messages.error(request, 'Saldo insuficiente para realizar este pago.')
+
+            elif tipo_tarifa == 'Pagar hora':
+                valor_tarifa = tarifas_valores[tipo_tarifa]  # Obtener el valor de la tarifa
+
+                # Debug: Mostrar el saldo antes de realizar el pago
+                print(f'Saldo del usuario antes del pago: {usuario.saldo}')
+                print(f'Valor de la tarifa seleccionada: {valor_tarifa}')
+
+                if usuario.saldo >= 3500:  # Verifica que el saldo sea suficiente
+                    try:
+                        usuario.saldo -= 3500  # Descuenta el saldo
+
+                        # Debug: Mostrar el saldo después de realizar el pago
+                        print(f'Saldo del usuario después del pago: {usuario.saldo}')
+
+                        usuario.save()  # Guarda los cambios
+                        messages.success(request, f'Pago de ${valor_tarifa} realizado con éxito. Saldo actualizado.')
+                        return redirect('home')
+                    except InvalidOperation:
+                        messages.error(request, 'Operación inválida al descontar el saldo.')
+                else:
+                    messages.error(request, 'Saldo insuficiente para realizar este pago.')
+
             elif tipo_tarifa == 'Recargar saldo':
                 if saldo > 0:
-                    usuario.saldo += saldo  # Sumar el saldo
-                    usuario.save()  # Guardar cambios
-                    messages.success(request, f'Saldo de ${saldo} recargado con éxito. Saldo actualizado.')
-                    return redirect('home')
+                    try:
+                        usuario.saldo += saldo  # Sumar el saldo
+                        usuario.save()  # Guardar cambios
+                        messages.success(request, f'Saldo de ${saldo} recargado con éxito. Saldo actualizado.')
+                        return redirect('home')
+                    except InvalidOperation:
+                        messages.error(request, 'Operación inválida al recargar el saldo.')
                 else:
                     messages.error(request, 'Monto inválido.')
             else:
