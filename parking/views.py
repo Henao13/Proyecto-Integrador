@@ -1,5 +1,5 @@
 # parking/views.py
-
+import google.generativeai as genai
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.http import JsonResponse
@@ -10,14 +10,40 @@ from django.contrib.auth.decorators import login_required
 from decimal import Decimal, InvalidOperation
 from .decorators import usuario_login_requerido
 from django.utils import timezone
+from dotenv import load_dotenv
+import os
+
+
+
+# Cargar las variables de entorno desde key.env
+load_dotenv('key.env')
+gemini_api_key = os.getenv('GENAI_API_KEY')
+
+# Configurar la clave API
+genai.configure(api_key=gemini_api_key)
+model= genai.GenerativeModel(model_name="gemini-1.5-flash")
 
 def home(request):
     usuario = None
     if 'usuario_id' in request.session:
         usuario_id = request.session['usuario_id']
         usuario = UsuarioFrecuente.objects.get(id_usuario=usuario_id)
-    
-    return render(request, 'home.html', {'usuario': usuario})
+
+    # Generar instrucciones usando la API de Gemini
+    prompt = "7 pasos para realizar un depósito en un sistema de parqueo y enuméralos."
+    instrucciones = model.generate_content(prompt)
+
+    # Extraer el contenido y eliminar el formato no deseado
+    contenido = instrucciones.candidates[0].content.parts[0].text
+    # Limpiar el contenido eliminando caracteres de formato como '**' y '##'
+    contenido_limpio = contenido.replace("**", "").replace("##", "").strip()
+
+    # Dividir el contenido por saltos de línea
+    pasos = [line.strip() for line in contenido_limpio.split('\n') if line]
+
+    return render(request, 'home.html', {'usuario': usuario, 'pasos': pasos})
+
+
 
 def user_login(request):
     if request.method == 'POST':
