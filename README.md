@@ -1,8 +1,8 @@
 # VirtualPark
 
-### Proyecto de parqueadero virtual, nuestra principal idea es poder optimizar el tiempo y la manera de pago de muchos estudiantes de la universidad EAFIT.
+### Virtual parking project, our main idea is to optimize the time and the way of payment of many students of the EAFIT University.
 
 Integrantes:
 - Santiago Henao.
-- Ceyni Beltrán.
 - Marcela Londoño.
+- Ceyni Beltrán.
