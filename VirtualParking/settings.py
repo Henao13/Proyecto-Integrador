@@ -12,6 +12,11 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 import os
+from dotenv import load_dotenv
+
+
+load_dotenv('key.env')  # Asegúrate de especificar la ruta de tu archivo .env si es diferente
+SENDGRID_API_KEY = os.getenv('SENDGRID_API_KEY')
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -28,6 +33,12 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+EMAIL_HOST = 'smtp.sendgrid.net'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'apikey'
+EMAIL_HOST_PASSWORD = SENDGRID_API_KEY
+EMAIL_USE_TLS = True
+
 
 # Application definition
 
@@ -41,6 +52,7 @@ INSTALLED_APPS = [
     'parking',
     'crispy_forms',
     'crispy_bootstrap5',
+    'anymail',
 ]
 
 CRISPY_TEMPLATE_PACK = 'bootstrap5'

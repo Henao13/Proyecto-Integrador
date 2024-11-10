@@ -1,4 +1,3 @@
-# parking/views.py
 import google.generativeai as genai
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
@@ -12,16 +11,42 @@ from .decorators import usuario_login_requerido
 from django.utils import timezone
 from dotenv import load_dotenv
 import os
-
-
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail
+from VirtualParking import settings
 
 # Cargar las variables de entorno desde key.env
 load_dotenv('key.env')
 gemini_api_key = os.getenv('GENAI_API_KEY')
+SENDGRID_API_KEY = os.getenv('SENDGRID_API_KEY')
 
 # Configurar la clave API
 genai.configure(api_key=gemini_api_key)
-model= genai.GenerativeModel(model_name="gemini-1.5-flash")
+model = genai.GenerativeModel(model_name="gemini-1.5-flash")
+
+# Función para enviar el correo de recarga de saldo
+def enviar_correo_recarga(usuario_email, monto_recargado):
+    if not settings.SENDGRID_API_KEY:
+        print("Error: La clave API de SendGrid no está configurada.")
+        return
+
+    if not usuario_email:
+        print("Error: El correo electrónico del usuario no está especificado.")
+        return
+
+    mensaje = Mail(
+        from_email='tucorreo@dominio.com',  # Cambia esto al correo verificado en SendGrid
+        to_emails=usuario_email,
+        subject='Recarga de Saldo Exitosa',
+        html_content=f'<p>Estimado usuario,</p><p>Se ha recargado exitosamente un monto de ${monto_recargado} a su cuenta.</p>'
+    )
+    
+    try:
+        sg = SendGridAPIClient(settings.SENDGRID_API_KEY)
+        response = sg.send(mensaje)
+        print("Correo enviado con éxito. Estado:", response.status_code)
+    except Exception as e:
+        print("Error al enviar el correo:", e)
 
 def home(request):
     usuario = None
@@ -35,15 +60,11 @@ def home(request):
 
     # Extraer el contenido y eliminar el formato no deseado
     contenido = instrucciones.candidates[0].content.parts[0].text
-    # Limpiar el contenido eliminando caracteres de formato como '**' y '##'
     contenido_limpio = contenido.replace("**", "").replace("##", "").strip()
 
-    # Dividir el contenido por saltos de línea
     pasos = [line.strip() for line in contenido_limpio.split('\n') if line]
 
     return render(request, 'home.html', {'usuario': usuario, 'pasos': pasos})
-
-
 
 def user_login(request):
     if request.method == 'POST':
@@ -60,7 +81,6 @@ def user_login(request):
     else:
         form = LoginForm()
     return render(request, 'login.html', {'form': form})
-
 
 def user_logout(request):
     if 'usuario_id' in request.session:
@@ -91,7 +111,6 @@ def saldo(request):
 
 @usuario_login_requerido
 def payment(request):
-    # Obtener el usuario de la sesión
     usuario_id = request.session['usuario_id']
     usuario = UsuarioFrecuente.objects.get(id_usuario=usuario_id)
 
@@ -101,77 +120,44 @@ def payment(request):
             tipo_tarifa = form.cleaned_data['tipo_tarifa']
             saldo = Decimal(form.cleaned_data['saldo']) if tipo_tarifa == 'Recargar saldo' else Decimal('0.00')
 
-            # Definir los valores de las tarifas
             tarifas_valores = {
                 'Pagar día': Decimal('14000'),
                 'Pagar hora': Decimal('3500'),
                 'Recargar saldo': saldo  
             }
 
-            # Debug: Mostrar el tipo de tarifa seleccionada
-            print(f'Tipo de tarifa seleccionada: {tipo_tarifa}')
-
-            # Manejo de pago por tarifa
             if tipo_tarifa == 'Pagar día':
-                valor_tarifa = tarifas_valores[tipo_tarifa]  # Obtener el valor de la tarifa
-
-                # Debug: Mostrar el saldo antes de realizar el pago
-                print(f'Saldo del usuario antes del pago: {usuario.saldo}')
-                print(f'Valor de la tarifa seleccionada: {valor_tarifa}')
-
-                if usuario.saldo >= 14000:  # Verifica que el saldo sea suficiente
-                    try:
-                        usuario.saldo -= 14000  # Descuenta el saldo
-
-                        # Debug: Mostrar el saldo después de realizar el pago
-                        print(f'Saldo del usuario después del pago: {usuario.saldo}')
-
-                        usuario.save()  # Guarda los cambios
-                        messages.success(request, f'Pago de ${valor_tarifa} realizado con éxito. Saldo actualizado.')
-                        return redirect('home')
-                    except InvalidOperation:
-                        messages.error(request, 'Operación inválida al descontar el saldo.')
+                valor_tarifa = tarifas_valores[tipo_tarifa]
+                if usuario.saldo >= valor_tarifa:
+                    usuario.saldo -= valor_tarifa
+                    usuario.save()
+                    messages.success(request, f'Pago de ${valor_tarifa} realizado con éxito. Saldo actualizado.')
+                    return redirect('home')
                 else:
                     messages.error(request, 'Saldo insuficiente para realizar este pago.')
 
             elif tipo_tarifa == 'Pagar hora':
-                valor_tarifa = tarifas_valores[tipo_tarifa]  # Obtener el valor de la tarifa
-
-                # Debug: Mostrar el saldo antes de realizar el pago
-                print(f'Saldo del usuario antes del pago: {usuario.saldo}')
-                print(f'Valor de la tarifa seleccionada: {valor_tarifa}')
-
-                if usuario.saldo >= 3500:  # Verifica que el saldo sea suficiente
-                    try:
-                        usuario.saldo -= 3500  # Descuenta el saldo
-
-                        # Debug: Mostrar el saldo después de realizar el pago
-                        print(f'Saldo del usuario después del pago: {usuario.saldo}')
-
-                        usuario.save()  # Guarda los cambios
-                        messages.success(request, f'Pago de ${valor_tarifa} realizado con éxito. Saldo actualizado.')
-                        return redirect('home')
-                    except InvalidOperation:
-                        messages.error(request, 'Operación inválida al descontar el saldo.')
+                valor_tarifa = tarifas_valores[tipo_tarifa]
+                if usuario.saldo >= valor_tarifa:
+                    usuario.saldo -= valor_tarifa
+                    usuario.save()
+                    messages.success(request, f'Pago de ${valor_tarifa} realizado con éxito. Saldo actualizado.')
+                    return redirect('home')
                 else:
                     messages.error(request, 'Saldo insuficiente para realizar este pago.')
 
             elif tipo_tarifa == 'Recargar saldo':
                 if saldo > 0:
-                    try:
-                        usuario.saldo += saldo  # Sumar el saldo
-                        usuario.save()  # Guardar cambios
-                        messages.success(request, f'Saldo de ${saldo} recargado con éxito. Saldo actualizado.')
-                        return redirect('home')
-                    except InvalidOperation:
-                        messages.error(request, 'Operación inválida al recargar el saldo.')
+                    usuario.saldo += saldo
+                    usuario.save()
+                    enviar_correo_recarga(usuario.email, saldo)
+                    messages.success(request, f'Saldo de ${saldo} recargado con éxito. Saldo actualizado.')
+                    return redirect('home')
                 else:
                     messages.error(request, 'Monto inválido.')
             else:
                 messages.error(request, 'Tipo de tarifa no válido.')
         else:
-            # Debug: Mostrar errores de validación
-            print("Errores en el formulario:", form.errors)
             messages.error(request, 'Formulario inválido.')
     else:
         form = PaymentForm()
