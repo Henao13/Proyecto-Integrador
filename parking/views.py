@@ -106,7 +106,6 @@ def payment(request):
                 if saldo > 0:
                     usuario.saldo += saldo
                     usuario.save()
-                    enviar_correo_recarga(usuario.email, saldo)
                     messages.success(request, f'Saldo de ${saldo} recargado con éxito. Saldo actualizado.')
                     return redirect('home')
                 else:
