@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'parking',
     'crispy_forms',
+    'crispy_bootstrap5',
     'anymail',
 ]
 
