@@ -15,39 +15,6 @@ from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 from VirtualParking import settings
 
-# Cargar las variables de entorno desde key.env
-load_dotenv('key.env')
-gemini_api_key = os.getenv('GENAI_API_KEY')
-SENDGRID_API_KEY = os.getenv('SENDGRID_API_KEY')
-
-# Configurar la clave API
-genai.configure(api_key=gemini_api_key)
-model = genai.GenerativeModel(model_name="gemini-1.5-flash")
-
-# Función para enviar el correo de recarga de saldo
-def enviar_correo_recarga(usuario_email, monto_recargado):
-    if not settings.SENDGRID_API_KEY:
-        print("Error: La clave API de SendGrid no está configurada.")
-        return
-
-    if not usuario_email:
-        print("Error: El correo electrónico del usuario no está especificado.")
-        return
-
-    mensaje = Mail(
-        from_email='tucorreo@dominio.com',  # Cambia esto al correo verificado en SendGrid
-        to_emails=usuario_email,
-        subject='Recarga de Saldo Exitosa',
-        html_content=f'<p>Estimado usuario,</p><p>Se ha recargado exitosamente un monto de ${monto_recargado} a su cuenta.</p>'
-    )
-    
-    try:
-        sg = SendGridAPIClient(settings.SENDGRID_API_KEY)
-        response = sg.send(mensaje)
-        print("Correo enviado con éxito. Estado:", response.status_code)
-    except Exception as e:
-        print("Error al enviar el correo:", e)
-
 def home(request):
     usuario = None
     if 'usuario_id' in request.session:
