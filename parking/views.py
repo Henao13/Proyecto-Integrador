@@ -53,18 +53,7 @@ def home(request):
     if 'usuario_id' in request.session:
         usuario_id = request.session['usuario_id']
         usuario = UsuarioFrecuente.objects.get(id_usuario=usuario_id)
-
-    # Generar instrucciones usando la API de Gemini
-    prompt = "7 pasos para realizar un depósito en un sistema de parqueo y enuméralos."
-    instrucciones = model.generate_content(prompt)
-
-    # Extraer el contenido y eliminar el formato no deseado
-    contenido = instrucciones.candidates[0].content.parts[0].text
-    contenido_limpio = contenido.replace("**", "").replace("##", "").strip()
-
-    pasos = [line.strip() for line in contenido_limpio.split('\n') if line]
-
-    return render(request, 'home.html', {'usuario': usuario, 'pasos': pasos})
+    return render(request, 'home.html', {'usuario': usuario})
 
 def user_login(request):
     if request.method == 'POST':
