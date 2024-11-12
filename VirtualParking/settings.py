@@ -31,7 +31,7 @@ SECRET_KEY = 'django-insecure-+9(1x+j@2ih$kbuavd*b0h*ycmt*%xeegpii&jewavdt7hm*=0
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['34.41.222.209']
+ALLOWED_HOSTS = ['34.45.65.244']
 
 EMAIL_HOST = 'smtp.sendgrid.net'
 EMAIL_PORT = 587
